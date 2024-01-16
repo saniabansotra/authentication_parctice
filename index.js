@@ -9,16 +9,16 @@ const jwt = require("jsonwebtoken");
 
 app.use(cookies());
 const { connectDatabase } = require("./connection/connect");
-const USER_MODEL = require("./model/usermodel");
+const USERS_MODEL = require("./model/usermodel");
 app.post("/api/userlogin", async (req, res) => {
   try {
     const newuser = {
-      username: req.body.username,
-      userid: req.body.userid,
-      userpassword: req.body.userpassword,
+      usersname: req.body.username,
+      usersid: req.body.userid,
+      userspassword: req.body.userpassword,
     };
-    const user = new USER_MODEL(newuser);
-    await user.save();
+    const appuser = new USERS_MODEL(newuser);
+    await appuser.save();
     return res.json({ success: true, message: "Data Saved successfully" });
   } catch (error) {
     return res.json({ success: false, error: error.message });
@@ -29,7 +29,8 @@ app.post("/api/login1", (req, res) => {
   try {
     console.log(req.body);
     let userid = req.body.userid;
-    if (req.body.password === 9090) {
+    const ver_password=USERS_MODEL.findOneUser({userpassword:req.params.userpassword});
+    if (ver_password) {
       const token = generatetoken(userid);
       console.log(token);
       res.cookie("web_tk", token);

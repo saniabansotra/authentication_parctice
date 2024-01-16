@@ -7,5 +7,5 @@ const user_schema = new mongoose.Schema(
   },
   { timestamp: true }
 );
-const user = mongoose.model("user", user_schema);
-module.exports = user;
+const appuser = mongoose.model("appuser", user_schema);
+module.exports = appuser;
