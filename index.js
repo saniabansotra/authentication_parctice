@@ -25,15 +25,27 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.post("/api/login", (req, res) => {
+app.post("/api/login", async (req, res) => {
   try {
     console.log(req.body);
-    let userid = req.body.userid;
-    const ver_password = USERS_MODEL.findOne({
-      userpassword: req.body.userpassword,
+
+    let { userpassword, username } = req.body;
+    // const check_name = USERS_MODEL.findOne({ username: username });
+    // const check_password = USERS_MODEL.findOne({
+    //   userpassword: userpassword,
+    // });
+    const user = await USERS_MODEL.findOne({
+      username: req.body.username,
+      // userpassword,
     });
-    if (ver_password) {
-      const token = generatetoken(userid);
+
+    // if (check_password && check_name)
+    console.log(user.userpassword);
+    console.log(user);
+    if (req.body.userpassword === user.userpassword) {
+      const u_id = user.userid;
+
+      const token = generatetoken(u_id);
       console.log(token);
       res.cookie("web_tk", token);
       return res.json({
@@ -44,7 +56,7 @@ app.post("/api/login", (req, res) => {
       return res.json({ success: false, message: "Incorrect Password" });
     }
   } catch (error) {
-    return res.json({ success: true, message: error.message });
+    return res.json({ success: false, message: error.message });
   }
 });
 
