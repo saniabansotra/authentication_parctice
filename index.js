@@ -13,13 +13,21 @@ const USERS_MODEL = require("./model/usermodel");
 app.post("/signup", async (req, res) => {
   try {
     const newuser = {
+      email: req.body.email.toLowerCase(),
       username: req.body.username,
       userid: req.body.userid,
       userpassword: req.body.userpassword,
     };
-    const clients = new USERS_MODEL(newuser);
-    await clients.save();
-    return res.json({ success: true, message: "Data Saved successfully" });
+    let checkemail = USERS_MODEL.findOne({
+      email: email,
+    });
+    if (!checkemail) {
+      const clients = new USERS_MODEL(newuser);
+      await clients.save();
+      return res.json({ success: true, message: "Data Saved successfully" });
+    } else {
+      return res.json({ success: false, message: "User already" });
+    }
   } catch (error) {
     return res.json({ success: false, error: error.message });
   }
@@ -29,21 +37,20 @@ app.post("/api/login", async (req, res) => {
   try {
     console.log(req.body);
 
-    let { userpassword, username } = req.body;
     // const check_name = USERS_MODEL.findOne({ username: username });
     // const check_password = USERS_MODEL.findOne({
     //   userpassword: userpassword,
     // });
-    const user = await USERS_MODEL.findOne({
-      username: req.body.username,
+    const checkuser = await USERS_MODEL.findOne({
+      email: req.body.email.toLowerCase(),
       // userpassword,
     });
 
     // if (check_password && check_name)
-    console.log(user.userpassword);
-    console.log(user);
-    if (req.body.userpassword === user.userpassword) {
-      const u_id = user.userid;
+    console.log(checkuser.userpassword);
+
+    if (req.body.userpassword === checkuser.userpassword) {
+      const u_id = checkuser.userid;
 
       const token = generatetoken(u_id);
       console.log(token);
