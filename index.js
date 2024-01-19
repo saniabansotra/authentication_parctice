@@ -10,13 +10,17 @@ const jwt = require("jsonwebtoken");
 app.use(cookies());
 const { connectDatabase } = require("./connection/connect");
 const USERS_MODEL = require("./model/usermodel");
+const { encrytPassword, verifyPassword } = require("./functions/encryption");
+// const { sendLoginOtp } = require("./functions/otp");
+
 app.post("/signup", async (req, res) => {
   try {
     const newuser = {
       email: req.body.email.toLowerCase(),
-      username: req.body.username,
+      username: await encrytPassword(req.body.username),
       userid: req.body.userid,
       userpassword: req.body.userpassword,
+      phonenumber: req.body.phonenumber,
     };
     let checkemail = await USERS_MODEL.findOne({
       email: req.body.email.toLowerCase(),
@@ -38,21 +42,16 @@ app.post("/api/login", async (req, res) => {
   try {
     console.log(req.body);
 
-    // const check_name = USERS_MODEL.findOne({ username: username });
-    // const check_password = USERS_MODEL.findOne({
-    //   userpassword: userpassword,
-    // });
+    let inputpassword = req.body.password;
     const checkuser = await USERS_MODEL.findOne({
       email: req.body.email.toLowerCase(),
-      // userpassword,
     });
 
     // if (check_password && check_name)
-    console.log(checkuser.userpassword);
+    let originalpassword = checkuser.userpassword;
 
-    if (req.body.userpassword === checkuser.userpassword) {
+    if (await verifyPassword(inputpassword, originalpassword)) {
       const u_id = checkuser.userid;
-
       const token = generatetoken(u_id);
       console.log(token);
       res.cookie("web_tk", token);

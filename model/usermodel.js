@@ -5,6 +5,7 @@ const user_schema = new mongoose.Schema(
     username: { type: String },
     userid: { type: Number },
     userpassword: { type: String },
+    phonenumber: { type: Number },
   },
   { timestamp: true }
 );
