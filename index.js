@@ -18,9 +18,10 @@ app.post("/signup", async (req, res) => {
       userid: req.body.userid,
       userpassword: req.body.userpassword,
     };
-    let checkemail = USERS_MODEL.findOne({
-      email: email,
+    let checkemail = await USERS_MODEL.findOne({
+      email: req.body.email.toLowerCase(),
     });
+    console.log(checkemail);
     if (!checkemail) {
       const clients = new USERS_MODEL(newuser);
       await clients.save();
